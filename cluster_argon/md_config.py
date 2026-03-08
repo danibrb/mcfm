@@ -2,3 +2,7 @@
 
 filename_xyz = "ar38_to.xyz"
 filename_lj = "parametri_lj.txt"
+
+#
+
+seed = 1234567890
