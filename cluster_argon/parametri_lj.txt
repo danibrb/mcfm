@@ -1,0 +1,3 @@
+     epsi_lj_k=119. Kelvin
+     sigma_lj=3.4 Angstrom
+     cbol=cbol=8.62d-05 eV/K
