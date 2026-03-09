@@ -7,7 +7,7 @@ filename_lj = "parametri_lj.txt"
 
 seed = 1234567890
 
-# Physical constants
+# Physical constants and conversion
 KB_EV_K = 8.62e-5           # Boltzmann constant in eV/K
 KB_J_K = 1.380649e-23        # Boltzmann constant in J/K
 AMU_TO_KG = 1.6605402e-27
