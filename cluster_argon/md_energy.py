@@ -27,3 +27,4 @@ def potential_energy(epsilon, sigma, n_atoms, positions=np.zeros(0)):
 def kinetic_intial(initial_temperature, initial_potential):
     energy = initial_temperature * KB_EV_K
     return energy - initial_potential
+

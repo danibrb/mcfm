@@ -19,10 +19,6 @@ def main():
     # convert epsilon in eV
     epsilon = epsi_lj_k * cbol
 
-    pot = (potential_energy(epsilon, sigma, n_atoms, positions))
-    kin = kinetic_intial(temp_i, pot)
-    
-    print(kin)
 
 
 if __name__ == "__main__":

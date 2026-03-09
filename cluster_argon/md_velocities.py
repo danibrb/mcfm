@@ -3,6 +3,7 @@ import random
 import math
 
 from md_config import KB_J_K, AMU_TO_KG
+from md_energy import kinetic_enegy
 
 def box_muller():
     """Generate two standard normal random numbers (Box-Muller transform)."""
@@ -35,3 +36,8 @@ def remove_com_velocity(velocities):
     """Remove velocity of center of mass"""
     com_velocity = np.mean(velocities)
     return velocities - com_velocity
+
+def rescale_velocities(velocities, initial_kinetic):
+    kinetic_bar = kinetic_enegy(velocities)
+    factor = np.sqrt(initial_kinetic / kinetic_bar)
+    return velocities * factor
