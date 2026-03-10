@@ -1,12 +1,16 @@
 import numpy as np
 
-from md_config import AMU_TO_KG, KB_EV_K, mass_amu
+from md_config import AMU_TO_KG, KB_EV_K, J_TO_EV, mass_amu
 
 def kinetic_energy(velocities):
-    """Calculates total kinetic energy."""
+    """Calculates total kinetic energy in eV."""
     mass = mass_amu * AMU_TO_KG
-    # Sum over all atoms and dimensions
-    return 0.5 * mass * np.sum(velocities ** 2)
+    
+    # Calculate in SI units (Joules)
+    kin_joules = 0.5 * mass * np.sum(velocities ** 2)
+    
+    # Convert to eV to match potential energy units
+    return kin_joules * J_TO_EV
 
 def lennard_jones(epsilon, sigma, distance):
     """Calculates LJ potential for a single pair."""

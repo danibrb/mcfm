@@ -11,6 +11,7 @@ seed = 1234567890
 KB_EV_K = 8.62e-5           # Boltzmann constant in eV/K
 KB_J_K = 1.380649e-23        # Boltzmann constant in J/K
 AMU_TO_KG = 1.6605402e-27
+J_TO_EV = 6.241509e18 
 
 # Physical parameters
 
