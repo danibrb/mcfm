@@ -52,3 +52,33 @@ def compute_forces(epsilon_ev: float, sigma_ang: float,
             forces[j] -= f_vec                         # Newton's third law
 
     return forces
+
+def compute_forces_and_potential(epsilon_ev: float, sigma_ang: float,
+                   positions: np.ndarray) -> tuple[np.ndarray, float]:
+    """
+    Compute LJ forces on all atoms, using Newton's third law.
+    Add potential calculations to optimize loop
+    """
+    n_atoms = len(positions)
+    forces  = np.zeros((n_atoms, 3))
+    potential = 0.0
+
+    for i in range(n_atoms):
+        for j in range(i + 1, n_atoms):
+            rij = positions[i] - positions[j]          # vector j->i   [Å]
+            r   = np.linalg.norm(rij)
+            if r == 0.0:
+                continue
+            
+            s_r      = sigma_ang / r
+            # Compute LJ potential
+            potential += 4.0 * epsilon_ev * (s_r**12 - s_r**6)
+            
+            # Scalar prefactor: 24ε·[2(σ/r)¹²−(σ/r)⁶] / r²   [eV/Å²]
+            f_scalar = 24.0 * epsilon_ev * (2.0 * s_r**12 - s_r**6) / r**2
+            f_vec    = f_scalar * rij                  # force on atom i  [eV/Å]
+
+            forces[i] += f_vec
+            forces[j] -= f_vec                         # Newton's third law
+
+    return forces, potential
