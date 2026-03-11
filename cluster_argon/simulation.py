@@ -18,6 +18,7 @@ from config         import (FILENAME_XYZ, FILENAME_LJ, MASS_AMU,
 from io_handler     import read_xyz, read_lj_params
 from initialization import initialize_velocities
 from nve            import run_nve
+from visualization import plot_all
 
 
 def main() -> None:
@@ -44,14 +45,17 @@ def main() -> None:
     )
 
     # 4. Print summary
-    print(f"\n{'t [fs]':>10}  {'K [eV]':>14}  {'U [eV]':>14}  {'E [eV]':>14}  {'T [K]':>8}")
-    print("-" * 68)
-    for i in range(len(trajectory['times'])):
-        print(f"{trajectory['times'][i]:>10.1f}  "
-              f"{trajectory['kinetic_energy'][i]:>+14.6e}  "
-              f"{trajectory['potential_energy'][i]:>+14.6e}  "
-              f"{trajectory['total_energy'][i]:>+14.6e}  "
-              f"{trajectory['temperature'][i]:>8.3f}")
+    # print(f"\n{'t [fs]':>10}  {'K [eV]':>14}  {'U [eV]':>14}  {'E [eV]':>14}  {'T [K]':>8}")
+    # print("-" * 68)
+    # for i in range(len(trajectory['times'])):
+    #     print(f"{trajectory['times'][i]:>10.1f}  "
+    #           f"{trajectory['kinetic_energy'][i]:>+14.6e}  "
+    #           f"{trajectory['potential_energy'][i]:>+14.6e}  "
+    #           f"{trajectory['total_energy'][i]:>+14.6e}  "
+    #           f"{trajectory['temperature'][i]:>8.3f}")
+        
+    # 5. Plot data
+    plot_all(trajectory)
 
 
 if __name__ == "__main__":

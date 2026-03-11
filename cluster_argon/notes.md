@@ -15,4 +15,9 @@ Compute LJ force
     -problem with units
     -choose to work in eV
     -adapt everything accordingly
+
+Add observables
+    -calculate temperature
+
+Add NVE simulations
     
