@@ -2,7 +2,6 @@
 Simulation configuration
 """
 
-
 # I/O
 
 FILENAME_XYZ = "ar38_to.xyz"
