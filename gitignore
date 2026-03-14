@@ -129,6 +129,8 @@ data/raw/
 data/processed/
 data/external/
 
+trajectory*.xyz
+
 
 # ------------------------------------------------------------
 # Logs
