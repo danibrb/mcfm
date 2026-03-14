@@ -17,8 +17,9 @@ from config         import (FILENAME_XYZ, FILENAME_LJ, MASS_AMU,
                              TEMP_INIT_K, TIMESTEP_FS, N_STEPS, RANDOM_SEED)
 from io_handler     import read_xyz, read_lj_params
 from initialization import initialize_velocities
+from lj_potential   import warmup_jit
 from nve            import run_nve
-from visualization import plot_all
+from visualization  import plot_all
 
 
 def main() -> None:
@@ -36,7 +37,10 @@ def main() -> None:
     rng = np.random.default_rng(RANDOM_SEED)
     velocities = initialize_velocities(n_atoms, MASS_AMU, TEMP_INIT_K, rng)
 
-    # 3. Run NVE simulation
+    # 3. Warm up Numba JIT before timed loop
+    warmup_jit(epsilon_ev, sigma_ang, positions)
+
+    # 4. Run NVE simulation
     print(f"\nRunning NVE simulation: {N_STEPS} steps, dt = {TIMESTEP_FS} fs")
     trajectory = run_nve(
         positions, velocities,

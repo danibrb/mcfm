@@ -12,9 +12,7 @@ from constants import KB_EV, AMU_ANG2_FS2_TO_EV
 
 def kinetic_energy(velocities: np.ndarray, mass_amu: float) -> float:
     """
-    Total kinetic energy.
-
-    KE [eV] = ½ · m [amu] · Σ v² [Å²/fs²] · AMU_ANG2_FS2_TO_EV
+    Total kinetic energy in eV.
     """
     return 0.5 * mass_amu * np.sum(velocities**2) * AMU_ANG2_FS2_TO_EV
 
@@ -23,8 +21,7 @@ def target_kinetic_energy(n_atoms: int, temperature_k: float) -> float:
     """
     Target kinetic energy from the equipartition theorem.
 
-    ⟨K⟩ = (3N - 3)/2 · k_B · T
-
+    <K> = (3N - 3)/2 · k_B · T
     """
     dof = 3 * n_atoms - 3       # degrees of freedom after COM removal
     return 0.5 * dof * KB_EV * temperature_k
