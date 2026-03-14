@@ -1,23 +1,37 @@
-#Notes about this project
+# Changelog
 
-Create basic structure
-Read xyz and parameters files
+All notable changes to this project will be documented in this file.
 
-Generating velocities
-    -box-muller
-    -maxwell distribution
-    -remove com velocity
-    -calculate kinetic energy
-    -rescale to target temperature
-    -put everything together
+---
 
-Compute LJ force
-    -problem with units
-    -choose to work in eV
-    -adapt everything accordingly
+## [Unreleased]
 
-Add observables
-    -calculate temperature
+### Added
+- **Project Structure**: Created basic project structure.
+- **File Reading**: Added support for reading `xyz` and parameters files.
+- **File Writing**: Added support for saving trajectory to `xyz` file. 
 
-Add NVE simulations
-    
+### Features
+- **Velocity Generation**:
+  - ~~Implemented Box-Muller transform for random number generation.~~
+  - Added Maxwell-Boltzmann distribution for velocity assignment.
+  - Removed center-of-mass velocity.
+  - Calculated kinetic energy and rescaled velocities to target temperature.
+  - Integrated all steps into a cohesive workflow.
+
+- **Lennard-Jones Force Calculation**:
+  - Resolved unit inconsistencies.
+  - Standardized units to electronvolts (eV) for consistency.
+  - Adapted all calculations accordingly.
+
+- **Observables**:
+  - Added temperature calculation.
+
+- **Simulation**:
+  - Implemented NVE (microcanonical) ensemble simulations.
+
+- **Visualization**:
+  - Added plots for:
+    - Kinetic, potential, and total energy.
+    - Temperature.
+    - X-coordinate of the first particle.

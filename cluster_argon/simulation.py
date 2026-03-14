@@ -13,9 +13,9 @@ Unit system:
 import numpy as np
 
 from constants      import KB_EV
-from config         import (FILENAME_XYZ, FILENAME_LJ, MASS_AMU,
+from config         import (FILENAME_XYZ_IN, FILENAME_LJ, FILENAME_XYZ_OUT, MASS_AMU,
                              TEMP_INIT_K, TIMESTEP_FS, N_STEPS, RANDOM_SEED)
-from io_handler     import read_xyz, read_lj_params
+from io_handler     import read_xyz, read_lj_params, write_xyz_trajectory
 from initialization import initialize_velocities
 from lj_potential   import warmup_jit
 from nve            import run_nve
@@ -25,7 +25,7 @@ from visualization  import plot_all
 def main() -> None:
 
     # 1. Read structure and Lennard-Jones parameters
-    n_atoms, positions, atom_names, comment = read_xyz(FILENAME_XYZ)
+    n_atoms, positions, atom_names, comment = read_xyz(FILENAME_XYZ_IN)
     print(f"Loaded {n_atoms} atoms  ({comment})")
 
     params     = read_lj_params(FILENAME_LJ)
@@ -57,8 +57,11 @@ def main() -> None:
     #           f"{trajectory['potential_energy'][i]:>+14.6e}  "
     #           f"{trajectory['total_energy'][i]:>+14.6e}  "
     #           f"{trajectory['temperature'][i]:>8.3f}")
-        
-    # 5. Plot data
+
+    # 5. Save VMD trajectory
+    write_xyz_trajectory(FILENAME_XYZ_OUT, trajectory["positions"], atom_names, trajectory["times"])
+
+    # 6. Plot data
     plot_all(trajectory)
 
 
