@@ -67,7 +67,8 @@ def run_nve(positions:     np.ndarray,
                 pot_trajectory.append(U)
                 temp_trajectory.append(T)
 
-                #pbar.set_postfix(T=f"{T:.2f} K", E=f"{U + K:.4e} eV")
+                pbar.set_postfix(T=f"{T:.2f} K",
+                                 E=f"{U + K:.4e} eV")
 
             pbar.update(1)
 
