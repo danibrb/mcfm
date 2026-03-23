@@ -31,6 +31,7 @@ def compute_forces_and_potential(epsilon_ev: float, sigma_ang: float,
 
             potential += 4.0 * epsilon_ev * (s12 - s6)
 
+            # takeing out 1/r2 to get a simpler factor to calculate
             f_scalar = 24.0 * epsilon_ev * (2.0 * s12 - s6) / r2
             forces[i, 0] += f_scalar * dx
             forces[i, 1] += f_scalar * dy
