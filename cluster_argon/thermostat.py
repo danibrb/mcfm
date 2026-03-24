@@ -28,8 +28,9 @@ def andersen(velocities:        np.ndarray,
     # generates new velocities at target temperature
     new_velocities = maxwell_boltzmann_velocities(n_atoms, mass_amu, target_temp_k, rng)
     # applying mask to assign new velocities to selected particles 
-    velocities[collide] = new_velocities[collide]        
+    result = velocities.copy()
+    result[collide] = new_velocities[collide]     
 
-    return velocities
+    return result
 
 
