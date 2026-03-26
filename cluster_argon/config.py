@@ -6,8 +6,8 @@ import os
 
 # I/O
 
-FILENAME_XYZ_IN  = "ar38_to.xyz"
-FILENAME_LJ      = "parametri_lj.txt"
+FILENAME_XYZ_IN  = os.path.join("..", "input", "ar38_to.xyz.keep") 
+FILENAME_LJ      = os.path.join("..", "input", "parametri_lj.txt") 
 
 # Output directories
 OUTPUT_DIR_NVE  = os.path.join("..", "output", "nve")
