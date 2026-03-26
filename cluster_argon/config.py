@@ -10,10 +10,11 @@ FILENAME_XYZ_IN  = "ar38_to.xyz"
 FILENAME_LJ      = "parametri_lj.txt"
 
 # Output directories
-OUTPUT_DIR_NVE  = os.path.join("output", "nve")
-OUTPUT_DIR_NVT  = os.path.join("output", "nvt")
-OUTPUT_DIR_AND = os.path.join("output", "andersen_analysis")
-OUTPUT_DIR_RAMP = os.path.join("output", "heating_ramp")
+OUTPUT_DIR_NVE  = os.path.join("..", "output", "nve")
+OUTPUT_DIR_NVT  = os.path.join("..", "output", "nvt")
+OUTPUT_DIR_AND = os.path.join("..", "output", "andersen_analysis")
+
+# Integrator sOUTPUT_DIR_RAMP = os.path.join("output", "heating_ramp")
 
 # Integrator settings
 
