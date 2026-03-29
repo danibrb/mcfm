@@ -6,15 +6,6 @@ from temp_start_k to temp_end_k over n_steps integration steps:
 
     T_target(i) = T_start + (T_end - T_start) * i / n_steps
 
-This allows observation of the solid-to-liquid phase transition of the
-Ar_38 cluster as a function of temperature by monitoring discontinuities
-in the potential energy E_pot(T) and the caloric curve E_tot(T).
-
-References
-----------
-- H. C. Andersen, J. Chem. Phys. 72, 2384 (1980).
-- D. J. Wales & R. S. Berry, J. Chem. Phys. 92, 4283 (1990) — for the
-  melting behaviour of rare-gas clusters.
 """
 
 import time
@@ -43,34 +34,6 @@ def run_heating_ramp(positions:      np.ndarray,
                      save_interval:  int = 100) -> dict:
     """
     Run a linearly ramped NVT simulation.
-
-    Parameters
-    ----------
-    positions      : (N, 3) initial positions          [Å]
-    velocities     : (N, 3) initial velocities         [Å/fs]
-    mass_amu       : particle mass                     [amu]
-    epsilon_ev     : LJ well depth                     [eV]
-    sigma_ang      : LJ diameter                       [Å]
-    dt_fs          : integration timestep              [fs]
-    n_steps        : total number of MD steps
-    temp_start_k   : initial thermostat temperature    [K]
-    temp_end_k     : final   thermostat temperature    [K]
-    collision_freq : Andersen collision frequency      [1/fs]
-    rng            : NumPy random generator instance
-    save_interval  : save observables every N steps
-
-    Returns
-    -------
-    dict with keys:
-        times            : saved times                  [fs]
-        positions        : saved position frames        [Å]
-        velocities       : saved velocity frames        [Å/fs]
-        kinetic_energy   : K at each saved step         [eV]
-        potential_energy : U at each saved step         [eV]
-        total_energy     : K + U at each saved step     [eV]
-        temperature      : instantaneous T              [K]
-        target_temp      : thermostat T_target          [K]
-        heating_rate_kps : dT/dt                        [K/ps]
     """
 
     # Linearly spaced target temperatures at each MD step

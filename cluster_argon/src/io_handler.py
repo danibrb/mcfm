@@ -11,23 +11,14 @@ DCD + PDB — binary DCD trajectory with a companion PDB topology file.
             Load in VMD: File > New Molecule > PDB (topology), then
             File > Load Data Into Molecule > DCD (trajectory).
 
-PDB notes
----------
-The PDB format is fixed-width.  VMD uses the element field (columns 77-78)
-to identify atom type and decide whether to draw bonds.  Without it, VMD
-falls back to distance-based bonding, which produces the unwanted rods.
-
-Each Ar atom is written as a HETATM record in its own residue so that
-VMD does not connect atoms that happen to be close together.
 """
 
 import numpy as np
 import mdtraj as md
 
 
-# ---------------------------------------------------------------------------
 # Input
-# ---------------------------------------------------------------------------
+
 
 def read_xyz(filename: str):
     """Parse an XYZ-format coordinate file."""
@@ -63,9 +54,9 @@ def read_lj_params(filename: str) -> dict:
     }
 
 
-# ---------------------------------------------------------------------------
+
 # XYZ output  (short simulations)
-# ---------------------------------------------------------------------------
+
 
 def write_xyz_trajectory(filename:   str,
                          positions:  np.ndarray,
@@ -92,9 +83,9 @@ def write_xyz_trajectory(filename:   str,
     print(f"Saved: {filename}  ({n_frames} frames, {n_atoms} atoms)")
 
 
-# ---------------------------------------------------------------------------
+
 # PDB output  (topology companion for DCD)
-# ---------------------------------------------------------------------------
+
 
 def _pdb_hetatm_line(serial:    int,
                      atom_name: str,
@@ -105,26 +96,8 @@ def _pdb_hetatm_line(serial:    int,
                      y:         float,
                      z:         float,
                      element:   str) -> str:
-    """
-    Build one PDB HETATM record, strictly obeying the fixed-column layout.
-
-    Column positions (1-indexed, inclusive):
-        1-6   record type   "HETATM"
-        7-11  serial number
-        13-16 atom name (left-justified in field)
-        18-20 residue name
-        22    chain ID
-        23-26 residue sequence number
-        31-38 x coordinate (8.3f)
-        39-46 y coordinate (8.3f)
-        47-54 z coordinate (8.3f)
-        55-60 occupancy
-        61-66 temperature factor
-        77-78 element symbol (right-justified)
-
-    Using HETATM instead of ATOM and one residue per atom prevents VMD
-    from drawing automatic distance-based bonds between Ar atoms.
-    """
+ 
+  
     # part1: cols 1-30  (30 chars before x)
     part1 = f"HETATM{serial:5d} {atom_name:<4s}{resname:>3s} {chain}{resseq:4d}     "
     # part2: cols 31-78  (48 chars: xyz + occ + bfac + pad + element)
@@ -135,13 +108,7 @@ def _pdb_hetatm_line(serial:    int,
 def write_pdb_file(filename:   str,
                    positions:  np.ndarray,
                    atom_names: list) -> None:
-    """
-    Write a single-frame PDB topology file.
 
-    One HETATM record per atom, each in its own residue (residue number =
-    atom index + 1).  The element symbol is written in columns 77-78 so
-    that VMD correctly identifies atom types and suppresses auto-bonding.
-    """
     n_atoms = positions.shape[0]
 
     with open(filename, 'w') as f:
@@ -166,17 +133,12 @@ def write_pdb_file(filename:   str,
     print(f"Saved: {filename}  ({n_atoms} atoms)")
 
 
-# ---------------------------------------------------------------------------
+
 # DCD output  (long simulations)
-# ---------------------------------------------------------------------------
+
 
 def _build_mdtraj_topology(atom_names: list) -> md.Topology:
-    """
-    Build an MDTraj topology with one residue per atom.
 
-    This avoids any automatic bond inference inside MDTraj and ensures
-    the companion PDB written by MDTraj carries no CONECT records.
-    """
     topology = md.Topology()
     chain    = topology.add_chain()
     for i, name in enumerate(atom_names):
@@ -191,13 +153,7 @@ def write_dcd_trajectory(filename:   str,
                          positions:  np.ndarray,
                          atom_names: list,
                          times:      np.ndarray) -> None:
-    """
-    Write a binary DCD trajectory using MDTraj.
 
-    Positions are converted from Angstrom to nanometres (MDTraj convention).
-    The DCD format does not store atom names or simulation times; load the
-    companion PDB file as the topology in VMD.
-    """
     n_frames, n_atoms, _ = positions.shape
     topology     = _build_mdtraj_topology(atom_names)
     positions_nm = (positions / 10.0).astype(np.float32)  # Å -> nm

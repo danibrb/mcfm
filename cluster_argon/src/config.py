@@ -1,49 +1,77 @@
 """
 Simulation configuration.
+
+Project layout:
+    project/
+        input/      ar38_to.xyz, parametri_lj.txt
+        output/     generated automatically
+        src/        all .py files
+
 """
 
 import os
 
+# Directory containing this file (src/)
+_SRC = os.path.dirname(os.path.abspath(__file__))
+
+# Project root (one level up from src/)
+_ROOT = os.path.dirname(_SRC)
+
+def _inp(*parts) -> str:
+    return os.path.join(_ROOT, "input",  *parts)
+
+def _out(*parts) -> str:
+    return os.path.join(_ROOT, "output", *parts)
+
+
 # I/O
 
-FILENAME_XYZ_IN  = os.path.join("..", "input", "ar38_to.xyz.keep") 
-FILENAME_LJ      = os.path.join("..", "input", "parametri_lj.txt") 
 
-# Output directories
-OUTPUT_DIR_NVE  = os.path.join("..", "output", "nve")
-OUTPUT_DIR_NVT  = os.path.join("..", "output", "nvt")
-OUTPUT_DIR_AND  = os.path.join("..", "output", "andersen_analysis")
-OUTPUT_DIR_RAMP = os.path.join("..", "output", "heating_ramp")
+FILENAME_XYZ_IN = _inp("ar38_to.xyz")
+FILENAME_LJ     = _inp("parametri_lj.txt")
 
-# Integrator settings
+OUTPUT_DIR_NVE  = _out("nve")
+OUTPUT_DIR_NVT  = _out("nvt")
+OUTPUT_DIR_AND  = _out("andersen_analysis")
+OUTPUT_DIR_HR   = _out("heating_ramp")
+#OUTPUT_DIR_LG   = _out("transition_LG")
+#OUTPUT_DIR_VAL   = _out("validation")
 
-TIMESTEP_FS   = 1           # Integration timestep  [fs]
-N_STEPS       = 100_000     # Steps for NVE and NVT
-SAVE_INTERVAL = 10          # Save trajectory frame every N steps
+
+# Integrator
+
+
+TIMESTEP_FS   = 1           # [fs]
+N_STEPS       = 100_000     # steps for the NVE / NVT comparison run
+SAVE_INTERVAL = 10          # save a frame every N steps
+
 
 # Particle properties
 
-MASS_AMU = 40.0             # Argon-40 atomic mass  [amu]
 
-# Thermodynamic state
+MASS_AMU = 40.0             # Argon-40  [amu]
 
-TEMP_INIT_K  = 20.0         # Initial temperature   [K]
 
-# Thermostat
+# NVE / NVT initial conditions
 
-COLLISION_FREQ = 0.0004   # Andersen collision frequency  [1/fs]
+
+TEMP_INIT_K    = 20.0       # [K]
+COLLISION_FREQ = 0.0004     # Andersen eta_c  [1/fs]
+
 
 # Heating ramp
- 
-# Temperature range
-TEMP_RAMP_START_K = 15.0    # Starting temperature      [K]
-TEMP_RAMP_END_K   = 90.0   # Final temperature         [K]
- 
-# Number of steps: governs the heating rate dT/dt = ΔT / (N * dt).
-# With dt = 1 fs and N = 2_000_000 the total simulated time is 2 ns
 
-N_STEPS_RAMP       = 1_000_000
-SAVE_INTERVAL_RAMP = 100    
+
+TEMP_HR_START_K  = 15.0
+TEMP_HR_END_K    = 90.0
+N_STEPS_HR       = 2_500_000
+SAVE_INTERVAL_HR = 100
+
+
+# Andersen collision frequency for ramp simulations
+
+COLLISION_FREQ_RAMP = 5.6e-5    # [1/fs]
+
 
 # Reproducibility
 
