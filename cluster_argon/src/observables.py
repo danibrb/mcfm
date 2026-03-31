@@ -21,22 +21,24 @@ def temperature(velocities: np.ndarray, mass_amu: float) -> float:
 def compute_vacf(vel_trajectory: np.ndarray) -> np.ndarray:
     """
     Compute the normalised velocity autocorrelation function (VACF).
- 
-        C(t) = <v(t) * v(0)> / <v(0) * v(0)>
 
+        C(t) = <v(t) · v(0)> / <v(0) · v(0)>
+
+    The original implementation iterated over frames in a Python for-loop.
+    The vectorised form below computes all frames simultaneously via
+    NumPy broadcasting, eliminating the Python loop entirely:
+
+        dot_products[frame, atom] = sum_k  v[frame, atom, k] * v[0, atom, k]
+        vacf[frame]               = mean over atoms of dot_products[frame, :]
+
+    For VACF_STEPS=5000 this replaces 5000 Python iterations with a single
+    (n_frames, n_atoms, 3) element-wise multiply followed by two reductions.
     """
-    n_frames, n_atoms, _ = vel_trajectory.shape
- 
-    # v0[i, alpha] = velocity of atom i at t=0 along component alpha
-    v0 = vel_trajectory[0]                          # shape (n_atoms, 3)
- 
-    # normalisation: <v(0) * v(0)> averaged over all atoms
-    norm = np.mean(np.sum(v0 * v0, axis=1))         # scalar
- 
-    vacf = np.zeros(n_frames)
-    for frame in range(n_frames):
-        vt = vel_trajectory[frame]                   # shape (n_atoms, 3)
-        # dot product per atom, then average over atoms
-        vacf[frame] = np.mean(np.sum(vt * v0, axis=1))
- 
+    v0   = vel_trajectory[0]                                    # (n_atoms, 3)
+    norm = np.mean(np.sum(v0 * v0, axis=1))                    # scalar
+
+    # broadcast v0 over the frames axis: (n_frames, n_atoms, 3)
+    dot_products = np.sum(vel_trajectory * v0[np.newaxis], axis=2)  # (n_frames, n_atoms)
+    vacf = np.mean(dot_products, axis=1)                            # (n_frames,)
+
     return vacf / norm

@@ -1,10 +1,8 @@
 """
 Heating-ramp NVT simulation of the Ar_38 Lennard-Jones cluster.
-
 """
 
 import os
-
 import numpy as np
 
 from constants      import KB_EV
@@ -30,7 +28,7 @@ def main() -> None:
     sigma_ang  = params['sigma_ang']
     print(f"LJ parameters: epsilon = {epsilon_ev:.6e} eV,  sigma = {sigma_ang:.4f} Å")
 
-    # 2. Warm up Numba JIT before the timed loop
+    # 2. Warm up all JIT kernels before the timed loop
     warmup_jit(epsilon_ev, sigma_ang, positions)
 
     # 3. Initialise velocities at the starting temperature
@@ -55,7 +53,7 @@ def main() -> None:
         temp_start_k=TEMP_HR_START_K,
         temp_end_k=TEMP_HR_END_K,
         collision_freq=COLLISION_FREQ_RAMP,
-        rng=rng,
+        random_seed=RANDOM_SEED,
         save_interval=SAVE_INTERVAL_HR,
     )
 
@@ -75,7 +73,6 @@ def main() -> None:
         traj['positions'], atom_names, traj['times'],
     )
 
-    # Diagnostic and caloric-curve plots
     plot_ramp_all(traj, label=label, save_dir=OUTPUT_DIR_HR)
 
     print(f"\nAll output saved to: {OUTPUT_DIR_HR}/")

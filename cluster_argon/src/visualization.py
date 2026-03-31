@@ -323,12 +323,13 @@ def plot_caloric_curve(target_temp:      np.ndarray,
     fig, axes = plt.subplots(2, 1, figsize=(9, 11), sharex=True)
 
     ax1 = axes[0]
-    ax1.fill_between(T_tot,
-                     E_tot_mean - E_tot_std,
-                     E_tot_mean + E_tot_std,
-                     color='tab:green', alpha=0.25, label=r'$\pm 1\sigma$')
+    # ax1.fill_between(T_tot,
+    #                  E_tot_mean - E_tot_std,
+    #                  E_tot_mean + E_tot_std,
+    #                  color='tab:green', alpha=0.25, label=r'$\pm 1\sigma$')
+    ax1.scatter(target_temp, total_energy, color='gray', alpha=0.3, s=5, label='E_tot (raw)')
     ax1.plot(T_tot, E_tot_mean,
-             color='darkgreen', lw=1.8, label='E_tot (bin mean)')
+             color='darkgreen', lw=1.8, label='E_tot (mean)')
     ax1.set_ylabel('Total energy [eV]')
     ax1.set_title(f'Caloric curve — {label}')
     ax1.legend(loc='upper left')
@@ -336,12 +337,13 @@ def plot_caloric_curve(target_temp:      np.ndarray,
     ax1.grid(True, which='minor', alpha=0.1)
 
     ax2 = axes[1]
-    ax2.fill_between(T_pot,
-                     E_pot_mean - E_pot_std,
-                     E_pot_mean + E_pot_std,
-                     color='tab:blue', alpha=0.25, label=r'$\pm 1\sigma$')
+    # ax2.fill_between(T_pot,
+    #                  E_pot_mean - E_pot_std,
+    #                  E_pot_mean + E_pot_std,
+    #                  color='tab:blue', alpha=0.25, label=r'$\pm 1\sigma$')
+    ax2.scatter(target_temp, potential_energy, color='gray', alpha=0.3, s=5, label='E_pot (raw)')
     ax2.plot(T_pot, E_pot_mean,
-             color='darkblue', lw=1.8, label='E_pot (bin mean)')
+             color='darkblue', lw=1.8, label='E_pot (mean)')
     ax2.set_ylabel('Potential energy [eV]')
     ax2.set_xlabel('Target temperature [K]')
     ax2.legend(loc='upper left')

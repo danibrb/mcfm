@@ -70,10 +70,10 @@ COLLISION_FREQ = 0.0004     # Andersen eta_c  [1/fs]
 #   N_STEPS_HR = 1.2e8 fs / 5 fs = 24_000_000  steps
 
 TEMP_HR_START_K  = 15.0
-TEMP_HR_END_K    = 27.0
+TEMP_HR_END_K    = 49.0
 TIMESTEP_FS_RAMP = 5.0          # [fs]  — dedicated ramp timestep
-N_STEPS_HR       = 24_000_000   # 24 M steps  x  5 fs  =  120 ns
-SAVE_INTERVAL_HR = 500          # save a frame every N steps
+N_STEPS_HR       = 35_000_000   # 24 M steps  x  5 fs  =  120 ns
+SAVE_INTERVAL_HR = 1000          # save a frame every N steps
 
 
 # Andersen collision frequency for ramp simulations

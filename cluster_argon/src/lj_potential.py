@@ -7,7 +7,7 @@ import numpy as np
 
 from numba import njit
  
-@njit(cache=True)
+@njit(cache=True, fastmath=True)
 def compute_forces_and_potential(epsilon_ev: float, sigma_ang: float,
                                     positions: np.ndarray) -> tuple:
     """
@@ -60,10 +60,32 @@ def compute_forces(epsilon_ev: float, sigma_ang: float,
 def warmup_jit(epsilon_ev: float, sigma_ang: float,
                 positions: np.ndarray) -> None:
     """
-    Trigger Numba JIT compilation before the timed simulation loop.
+    Trigger Numba JIT compilation for all kernels before the timed loop.
+
+    Warms up: LJ force kernel, fused Velocity Verlet step, and Andersen
+    thermostat.  All subsequent calls hit the compiled cache.
     """
-    print("Warming up JIT kernel...", end=" ", flush=True)
+    from integrator import velocity_verlet_step_jit
+    from thermostat import andersen_jit, seed_numba_rng
+    from constants  import FORCE_CONV
+
+    print("Warming up JIT kernels...", end=" ", flush=True)
+
+    # Force kernel
     compute_forces_and_potential(epsilon_ev, sigma_ang, positions)
+
+    # Fused VV step (inlines force kernel)
+    dummy_vel    = np.zeros_like(positions)
+    dummy_forces = np.zeros_like(positions)
+    force_conv_over_mass = FORCE_CONV / 40.0
+    velocity_verlet_step_jit(positions, dummy_vel, dummy_forces,
+                              force_conv_over_mass, 1.0,
+                              epsilon_ev, sigma_ang)
+
+    # Andersen thermostat
+    seed_numba_rng(0)
+    andersen_jit(dummy_vel, 40.0, 20.0, 1e-3, 1.0)
+
     print("done.")
 
 
