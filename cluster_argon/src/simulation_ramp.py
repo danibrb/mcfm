@@ -11,7 +11,7 @@ from constants      import KB_EV
 from config         import (FILENAME_XYZ_IN, FILENAME_LJ, OUTPUT_DIR_HR,
                              MASS_AMU, TEMP_HR_START_K, TEMP_HR_END_K,
                              TIMESTEP_FS, N_STEPS_HR, SAVE_INTERVAL_HR,
-                             COLLISION_FREQ, RANDOM_SEED)
+                             COLLISION_FREQ_RAMP, RANDOM_SEED)
 from io_handler     import read_xyz, read_lj_params, save_trajectory_with_metadata
 from initialization import initialize_velocities
 from lj_potential   import warmup_jit
@@ -42,7 +42,7 @@ def main() -> None:
     print("\nRunning heating ramp:")
     print(f"  From:  {TEMP_HR_START_K:.1f} K  -> To:  {TEMP_HR_END_K:.1f} K")
     print(f"  Total simulation time:  {N_STEPS_HR} steps  x  {TIMESTEP_FS} fs  =  {total_time_ps:.1f} ps")
-    print(f"  Andersen collision frequency: {COLLISION_FREQ:.4e} fs^-1")
+    print(f"  Andersen collision frequency: {COLLISION_FREQ_RAMP:.4e} fs^-1")
     print(f"  Save interval: every {SAVE_INTERVAL_HR} steps "
           f"({N_STEPS_HR // SAVE_INTERVAL_HR} frames)")
 
@@ -52,7 +52,7 @@ def main() -> None:
         TIMESTEP_FS, N_STEPS_HR,
         temp_start_k=TEMP_HR_START_K,
         temp_end_k=TEMP_HR_END_K,
-        collision_freq=COLLISION_FREQ,
+        collision_freq=COLLISION_FREQ_RAMP,
         rng=rng,
         save_interval=SAVE_INTERVAL_HR,
     )

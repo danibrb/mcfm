@@ -42,7 +42,7 @@ def run_heating_ramp(positions:      np.ndarray,
     total_time_fs = n_steps * dt_fs
     heating_rate  = (temp_end_k - temp_start_k) / (total_time_fs * 1e-3)   # K/ps
     print(f"  Heating rate: {heating_rate:.4f} K/ps  "
-          f"({temp_start_k:.1f} → {temp_end_k:.1f} K  "
+          f"({temp_start_k:.1f} -> {temp_end_k:.1f} K  "
           f"over {total_time_fs * 1e-3:.1f} ps)")
 
     times           = []

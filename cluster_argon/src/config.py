@@ -63,14 +63,14 @@ COLLISION_FREQ = 0.0004     # Andersen eta_c  [1/fs]
 
 
 TEMP_HR_START_K  = 15.0
-TEMP_HR_END_K    = 90.0
-N_STEPS_HR       = 2_500_000
-SAVE_INTERVAL_HR = 100
+TEMP_HR_END_K    = 27.0
+N_STEPS_HR       = 90_000_000
+SAVE_INTERVAL_HR = 25
 
 
 # Andersen collision frequency for ramp simulations
 
-COLLISION_FREQ_RAMP = 5.6e-5    # [1/fs]
+COLLISION_FREQ_RAMP = 5.0e-4    # [1/fs]
 
 
 # Reproducibility
