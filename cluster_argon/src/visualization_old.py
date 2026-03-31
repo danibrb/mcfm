@@ -255,80 +255,37 @@ def plot_ramp_temperature(times, temperature, target_temp, label="", save_dir=".
     _save(fig, save_dir, f"ramp_T_vs_t_{fn}.png")
 
 
-def _bin_caloric(target_temp: np.ndarray,
-                 energy:       np.ndarray,
-                 n_bins:       int) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Bin energy values by target temperature.
-
-    Divides [T_min, T_max] into n_bins equal-width intervals, then computes
-    the mean and standard deviation of energy within each populated bin.
-    Empty bins are silently dropped.  This is the standard reduction used
-    for finite-cluster caloric curves (Haberland et al., Phys. Rev. B 51,
-    11039, 1995; Wales & Berry, J. Chem. Phys. 92, 4283, 1990).
-
-    Returns
-    -------
-    T_bin   : bin-centre temperatures
-    E_mean  : mean energy per bin
-    E_std   : standard deviation per bin  (spread of instantaneous values,
-              not the standard error of the mean)
-    """
-    bin_edges  = np.linspace(target_temp.min(), target_temp.max(), n_bins + 1)
-    bin_idx    = np.digitize(target_temp, bin_edges) - 1
-    bin_idx    = np.clip(bin_idx, 0, n_bins - 1)
-
-    T_bin  = []
-    E_mean = []
-    E_std  = []
-
-    for b in range(n_bins):
-        mask = bin_idx == b
-        if mask.sum() < 2:
-            continue
-        T_bin.append(0.5 * (bin_edges[b] + bin_edges[b + 1]))
-        E_mean.append(float(np.mean(energy[mask])))
-        E_std.append(float(np.std(energy[mask])))
-
-    return np.array(T_bin), np.array(E_mean), np.array(E_std)
-
-
-def plot_caloric_curve(target_temp:      np.ndarray,
-                       total_energy:     np.ndarray,
-                       potential_energy: np.ndarray,
-                       label:            str = "",
-                       save_dir:         str = ".",
-                       n_bins:           int = 300) -> None:
+def plot_caloric_curve(target_temp, total_energy, potential_energy,
+                       label="", save_dir=".", smooth_window=10):
     """
     Caloric curve: E_tot and E_pot vs thermostat target temperature.
 
-    Data are reduced by temperature binning (n_bins equal-width intervals).
-    Within each bin the mean energy is plotted as a solid line; the shaded
-    band spans ±1 standard deviation, representing the spread of instantaneous
-    energy values at that temperature (Haberland et al., Phys. Rev. B 51,
-    11039, 1995).
+    Raw data are shown as a faint scatter; the moving-average overlay uses
+    _smooth_valid (mode='valid') to avoid the zero-padding artifacts that
+    arise with mode='same' at the first and last floor(window/2) points
+    (Press et al., Numerical Recipes, §13.4).
 
     Parameters
     ----------
-    n_bins : number of temperature bins (default 300).
-             With a 12 K range this gives ~0.04 K per bin, resolving the
-             phase transition while suppressing step-to-step fluctuations.
-             Increase for a smoother curve, decrease to expose more scatter.
+    smooth_window : number of consecutive frames averaged (default 10).
+                    The window is forced odd internally for symmetry.
     """
     fn = label.replace(" ", "_")
 
-    T_tot,  E_tot_mean,  E_tot_std  = _bin_caloric(target_temp, total_energy,     n_bins)
-    T_pot,  E_pot_mean,  E_pot_std  = _bin_caloric(target_temp, potential_energy, n_bins)
+    # Edge-safe smoothing: returns arrays shorter by (window-1) points,
+    # and the index array to slice target_temp consistently.
+    smooth_E_tot, idx = _smooth_valid(total_energy,     smooth_window)
+    smooth_E_pot, _   = _smooth_valid(potential_energy, smooth_window)
+    T_smooth = target_temp[idx]
 
-    fig, axes = plt.subplots(2, 1, figsize=(9, 11), sharex=True)
+    fig, axes = plt.subplots(2, 1, figsize=(8, 11), sharex=True)
 
     ax1 = axes[0]
-    ax1.fill_between(T_tot,
-                     E_tot_mean - E_tot_std,
-                     E_tot_mean + E_tot_std,
-                     color='tab:green', alpha=0.25, label=r'$\pm 1\sigma$')
-    ax1.plot(T_tot, E_tot_mean,
-             color='darkgreen', lw=1.8, label='E_tot (bin mean)')
+    ax1.scatter(target_temp, total_energy,
+                color='tab:green', alpha=0.25, s=0.4, label='E_tot (raw)')
+    ax1.plot(T_smooth, smooth_E_tot,
+             color='darkgreen', lw=1.4,
+             label=f'E_tot (moving avg, w={smooth_window})')
     ax1.set_ylabel('Total energy [eV]')
     ax1.set_title(f'Caloric curve — {label}')
     ax1.legend(loc='upper left')
@@ -336,12 +293,11 @@ def plot_caloric_curve(target_temp:      np.ndarray,
     ax1.grid(True, which='minor', alpha=0.1)
 
     ax2 = axes[1]
-    ax2.fill_between(T_pot,
-                     E_pot_mean - E_pot_std,
-                     E_pot_mean + E_pot_std,
-                     color='tab:blue', alpha=0.25, label=r'$\pm 1\sigma$')
-    ax2.plot(T_pot, E_pot_mean,
-             color='darkblue', lw=1.8, label='E_pot (bin mean)')
+    ax2.scatter(target_temp, potential_energy,
+                color='tab:blue', alpha=0.25, s=0.4, label='E_pot (raw)')
+    ax2.plot(T_smooth, smooth_E_pot,
+             color='darkblue', lw=1.4,
+             label=f'E_pot (moving avg, w={smooth_window})')
     ax2.set_ylabel('Potential energy [eV]')
     ax2.set_xlabel('Target temperature [K]')
     ax2.legend(loc='upper left')
@@ -350,8 +306,8 @@ def plot_caloric_curve(target_temp:      np.ndarray,
 
     t_min = float(np.min(target_temp))
     t_max = float(np.max(target_temp))
-    ax2.set_xticks(np.arange(t_min, t_max + 1, 2))
-    ax2.set_xticks(np.arange(t_min, t_max + 1, 0.5), minor=True)
+    ax2.set_xticks(np.arange(t_min, t_max + 1, 2))           # major every 2 K
+    ax2.set_xticks(np.arange(t_min, t_max + 1, 0.5), minor=True)  # minor every 0.5 K
 
     fig.tight_layout()
     _save(fig, save_dir, f"caloric_curve_{fn}.png")

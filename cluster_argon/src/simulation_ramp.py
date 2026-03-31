@@ -10,7 +10,7 @@ import numpy as np
 from constants      import KB_EV
 from config         import (FILENAME_XYZ_IN, FILENAME_LJ, OUTPUT_DIR_HR,
                              MASS_AMU, TEMP_HR_START_K, TEMP_HR_END_K,
-                             TIMESTEP_FS, N_STEPS_HR, SAVE_INTERVAL_HR,
+                             TIMESTEP_FS_RAMP, N_STEPS_HR, SAVE_INTERVAL_HR,
                              COLLISION_FREQ_RAMP, RANDOM_SEED)
 from io_handler     import read_xyz, read_lj_params, save_trajectory_with_metadata
 from initialization import initialize_velocities
@@ -38,18 +38,20 @@ def main() -> None:
     velocities = initialize_velocities(n_atoms, MASS_AMU, TEMP_HR_START_K, rng)
 
     # 4. Run the heating ramp
-    total_time_ps = N_STEPS_HR * TIMESTEP_FS * 1e-3
+    total_time_ns = N_STEPS_HR * TIMESTEP_FS_RAMP * 1e-6
     print("\nRunning heating ramp:")
-    print(f"  From:  {TEMP_HR_START_K:.1f} K  -> To:  {TEMP_HR_END_K:.1f} K")
-    print(f"  Total simulation time:  {N_STEPS_HR} steps  x  {TIMESTEP_FS} fs  =  {total_time_ps:.1f} ps")
+    print(f"  From:  {TEMP_HR_START_K:.1f} K  ->  To:  {TEMP_HR_END_K:.1f} K")
+    print(f"  Timestep:               {TIMESTEP_FS_RAMP} fs")
+    print(f"  Total simulation time:  {N_STEPS_HR} steps  x  {TIMESTEP_FS_RAMP} fs"
+          f"  =  {total_time_ns:.1f} ns")
     print(f"  Andersen collision frequency: {COLLISION_FREQ_RAMP:.4e} fs^-1")
-    print(f"  Save interval: every {SAVE_INTERVAL_HR} steps "
-          f"({N_STEPS_HR // SAVE_INTERVAL_HR} frames)")
+    print(f"  Save interval: every {SAVE_INTERVAL_HR} steps"
+          f"  ({N_STEPS_HR // SAVE_INTERVAL_HR} frames)")
 
     traj = run_heating_ramp(
         positions.copy(), velocities,
         MASS_AMU, epsilon_ev, sigma_ang,
-        TIMESTEP_FS, N_STEPS_HR,
+        TIMESTEP_FS_RAMP, N_STEPS_HR,
         temp_start_k=TEMP_HR_START_K,
         temp_end_k=TEMP_HR_END_K,
         collision_freq=COLLISION_FREQ_RAMP,
@@ -65,14 +67,6 @@ def main() -> None:
                        temp_end=TEMP_HR_END_K,
                        n_steps=N_STEPS_HR)
 
-    # # XYZ trajectory for VMD
-    # xyz_file = f"trajectory_{label}.xyz"
-    # write_xyz_trajectory(
-    #     os.path.join(OUTPUT_DIR_RAMP, xyz_file),
-    #     traj['positions'], atom_names, traj['times'],
-    # )
-
-    #  trajectory for VMD
     pdb_file = f"trajectory_{label}.pdb"
     dcd_file = f"trajectory_{label}.dcd"
     save_trajectory_with_metadata(

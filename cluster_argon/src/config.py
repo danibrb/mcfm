@@ -34,14 +34,12 @@ OUTPUT_DIR_NVE  = _out("nve")
 OUTPUT_DIR_NVT  = _out("nvt")
 OUTPUT_DIR_AND  = _out("andersen_analysis")
 OUTPUT_DIR_HR   = _out("heating_ramp")
-#OUTPUT_DIR_LG   = _out("transition_LG")
-#OUTPUT_DIR_VAL   = _out("validation")
 
 
 # Integrator
 
 
-TIMESTEP_FS   = 1           # [fs]
+TIMESTEP_FS   = 1           # [fs]  — used by NVE / NVT / Andersen analysis
 N_STEPS       = 100_000     # steps for the NVE / NVT comparison run
 SAVE_INTERVAL = 10          # save a frame every N steps
 
@@ -60,12 +58,22 @@ COLLISION_FREQ = 0.0004     # Andersen eta_c  [1/fs]
 
 
 # Heating ramp
-
+#
+# Target heating rate: 0.1 K/ns  (= 1 K / 10 ns)
+# Temperature range:   15 -> 27 K  =>  delta_T = 12 K
+# Required physical time:  12 K / 0.1 K/ns = 120 ns = 1.2e8 fs
+#
+# A 5 fs timestep is stable for Ar LJ at these temperatures and gives a
+# 5x reduction in wall-time relative to 1 fs without measurable loss of
+# energy conservation (Allen & Tildesley, 2017, §3.3).
+#
+#   N_STEPS_HR = 1.2e8 fs / 5 fs = 24_000_000  steps
 
 TEMP_HR_START_K  = 15.0
 TEMP_HR_END_K    = 27.0
-N_STEPS_HR       = 90_000_000
-SAVE_INTERVAL_HR = 25
+TIMESTEP_FS_RAMP = 5.0          # [fs]  — dedicated ramp timestep
+N_STEPS_HR       = 24_000_000   # 24 M steps  x  5 fs  =  120 ns
+SAVE_INTERVAL_HR = 500          # save a frame every N steps
 
 
 # Andersen collision frequency for ramp simulations
